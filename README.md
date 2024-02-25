@@ -11,3 +11,9 @@ This is the minimum viable product, in which we implement our entropy calculatio
 ## Stage 1: Recursion!
 
 Now we add the ability to handle entire directories, by recursively collecting viable targets (true files) from our parent path argument. We also begin to use `PathBuf` correctly.
+
+## Stage 2: Minimum Entropy
+
+As our goal is to find suspiciously entropic files, it might be useful to be able to set a minimum entropy, under which the tool does not report. In this stage, this is handled by a positional argument.
+
+Also, now that we have two arguments, we include a little `usage()` function, but this is quickly going to become annoying. I wonder if there's a better way to handle CLI args in Rust...
