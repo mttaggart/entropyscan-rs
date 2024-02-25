@@ -1,6 +1,7 @@
 use std::env::args;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 
 // Max Filesize of 2GB
 const MAX_FILESIZE: u64 = 2147483648;
@@ -19,8 +20,6 @@ const MAX_ENTROPY_CHUNK: usize = 2560000;
 /// for what will be scanned.
 ///
 fn calculate_entropy(path: &Path) -> Result<f64, String> {
-    // Announce intentions
-    println!("Scanning {:?}", &path);
 
     // Check for ELF
 
@@ -81,10 +80,21 @@ fn collect_targets(parent_path: PathBuf) -> Vec<PathBuf> {
 
 fn main() -> Result<(), String> {
     if let Some(target) = args().nth(1) {
+        // Minimum entropy to display
+        // Using let - match for ergonomics
+        // Note it's a f64
+        let min_entropy: f64 = match args().nth(2) {
+            Some(min_str) => f64::from_str(&min_str).unwrap_or(0.0),
+            None => 0.0
+        }; 
+        println!("Entropy Threshold: {min_entropy}");
         let targets = collect_targets(PathBuf::from(target.to_owned()));
         for target in targets {
             let entropy = calculate_entropy(&PathBuf::from(target.to_owned()))?;
-            println!("{target:?}: {entropy}");
+            // Only print when entropy is above threshold
+            if entropy >= min_entropy {
+                println!("{target:?}: {entropy}");
+            }
         }
         Ok(())
     } else {
