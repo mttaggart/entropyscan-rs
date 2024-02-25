@@ -10,10 +10,14 @@ const MAX_ENTROPY_CHUNK: usize = 2560000;
 fn calculate_entropy(filename: &str) -> Result<f64, String> {
     // Check for ELF
 
-    // Check max size
     if let Ok(metadata) = fs::metadata(filename) {
+        // Check max size
         if metadata.len() > MAX_FILESIZE {
             return Err("File too large!".to_string());
+        }
+        // Check whether it's a directory.
+        if metadata.is_dir() {
+            return Err("This is a directory!".to_string());
         }
     
         if let Ok(file_bytes) = fs::read(filename) {
