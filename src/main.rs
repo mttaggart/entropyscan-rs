@@ -78,7 +78,23 @@ fn collect_targets(parent_path: PathBuf) -> Vec<PathBuf> {
     targets
 }
 
+///
+/// Prints usage. Very simple, very silly. 
+///
+fn usage () {
+    println!("USAGE: entropy-rs [TARGET] [MIN_ENTROPY], where:");
+    println!("\tTARGET: File or path to scan");
+    println!("\tMIN_ENTROPY: Minimum Entropy (float) to report");
+}
+
 fn main() -> Result<(), String> {
+
+    // Check args length
+    if args().len() < 1 {
+        usage();
+        return Err("Not enough args!".to_string());
+    }
+
     if let Some(target) = args().nth(1) {
         // Minimum entropy to display
         // Using let - match for ergonomics
@@ -98,6 +114,7 @@ fn main() -> Result<(), String> {
         }
         Ok(())
     } else {
-        panic!("No path provided!")
+        usage();
+        Err("No path provided!".to_string())
     }
 }
