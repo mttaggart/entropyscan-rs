@@ -17,3 +17,8 @@ Now we add the ability to handle entire directories, by recursively collecting v
 As our goal is to find suspiciously entropic files, it might be useful to be able to set a minimum entropy, under which the tool does not report. In this stage, this is handled by a positional argument.
 
 Also, now that we have two arguments, we include a little `usage()` function, but this is quickly going to become annoying. I wonder if there's a better way to handle CLI args in Rust...
+
+## Stage 3: Clap!
+
+Before we add another feature, we need to clean up our CLI option management. It's time to use [clap](https://github.com/clap-rs/clap) to simplify our CLI configuraiton. This constitutes a major rebuild, but it will pay dividends in the long run.
+
