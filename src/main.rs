@@ -1,7 +1,24 @@
-use std::env::args;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
+use clap::{Parser};
+
+/// 
+/// Parser config
+///
+/// Also note that we can know directly create [PathBuf]
+/// objects from the args!
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Cli {
+
+    /// Target path
+    #[arg(short, long, value_name = "TARGET", help="Target file or path to scan")]
+    target: PathBuf,
+
+    /// Optional minimum entropy threshold
+    #[arg(short, long, value_name = "MIN_ENTROPY", help="Minimum entropy to display", default_value = "0")]
+    min_entropy: Option<f64>,
+}
 
 // Max Filesize of 2GB
 const MAX_FILESIZE: u64 = 2147483648;
@@ -78,43 +95,21 @@ fn collect_targets(parent_path: PathBuf) -> Vec<PathBuf> {
     targets
 }
 
-///
-/// Prints usage. Very simple, very silly. 
-///
-fn usage () {
-    println!("USAGE: entropy-rs [TARGET] [MIN_ENTROPY], where:");
-    println!("\tTARGET: File or path to scan");
-    println!("\tMIN_ENTROPY: Minimum Entropy (float) to report");
-}
 
 fn main() -> Result<(), String> {
 
-    // Check args length
-    if args().len() < 1 {
-        usage();
-        return Err("Not enough args!".to_string());
-    }
+    let args = Cli::parse();
+    let min_entropy = args.min_entropy.unwrap();
+    let target = args.target;
 
-    if let Some(target) = args().nth(1) {
-        // Minimum entropy to display
-        // Using let - match for ergonomics
-        // Note it's a f64
-        let min_entropy: f64 = match args().nth(2) {
-            Some(min_str) => f64::from_str(&min_str).unwrap_or(0.0),
-            None => 0.0
-        }; 
-        println!("Entropy Threshold: {min_entropy}");
-        let targets = collect_targets(PathBuf::from(target.to_owned()));
-        for target in targets {
-            let entropy = calculate_entropy(&PathBuf::from(target.to_owned()))?;
-            // Only print when entropy is above threshold
-            if entropy >= min_entropy {
-                println!("{target:?}: {entropy}");
-            }
+    println!("Entropy Threshold: {min_entropy}");
+    let targets = collect_targets(PathBuf::from(target.to_owned()));
+    for target in targets {
+        let entropy = calculate_entropy(&PathBuf::from(target.to_owned()))?;
+        // Only print when entropy is above threshold
+        if entropy >= min_entropy {
+            println!("{target:?}: {entropy}");
         }
-        Ok(())
-    } else {
-        usage();
-        Err("No path provided!".to_string())
     }
+    Ok(())
 }
