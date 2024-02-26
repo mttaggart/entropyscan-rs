@@ -22,3 +22,6 @@ Also, now that we have two arguments, we include a little `usage()` function, bu
 
 Before we add another feature, we need to clean up our CLI option management. It's time to use [clap](https://github.com/clap-rs/clap) to simplify our CLI configuraiton. This constitutes a major rebuild, but it will pay dividends in the long run.
 
+## Stage 4: Modules
+
+A big leap! In this stage, we refactor our code to get the logic out of `main.rs` and into a separate module. This lays the groundwork for easily adding new features.
