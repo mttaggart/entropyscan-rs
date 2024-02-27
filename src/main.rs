@@ -42,5 +42,12 @@ fn main() -> Result<(), String> {
         entropies.push(file_entropy);
     }
 
+    println!("PATH\tENTROPY");
+    for e in entropies {
+        if e.entropy >= min_entropy {
+            println!("{:?}\t{:.3}", e.path, e.entropy)
+        }
+    }
+
     Ok(())
 }
