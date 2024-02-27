@@ -1,6 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+pub mod structs;
+pub mod stats;
+use structs::FileEntropy;
+
 // Max Filesize of 2GB
 const MAX_FILESIZE: u64 = 2147483648;
 
@@ -17,7 +21,7 @@ const MAX_ENTROPY_CHUNK: usize = 2560000;
 /// Uses [MAX_FILESIZE] as a hard limit
 /// for what will be scanned.
 ///
-pub fn calculate_entropy(path: &Path) -> Result<f64, String> {
+pub fn calculate_entropy(path: &Path) -> Result<FileEntropy, String> {
 
     // Check for ELF
 
@@ -47,7 +51,10 @@ pub fn calculate_entropy(path: &Path) -> Result<f64, String> {
                     entropy -= p * p.log2();
                 }
             }
-            Ok(entropy)
+            Ok(FileEntropy {
+                path: path.to_owned(),
+                entropy
+            })
         } else {
             Err("Couldn't read file!".to_string())
         }

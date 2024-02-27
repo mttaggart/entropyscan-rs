@@ -1,14 +1,18 @@
-use std::fs;
 use std::path::{Path, PathBuf};
 use clap::{Parser};
 mod entropyscan;
-use entropyscan::{collect_targets, calculate_entropy};
+use entropyscan::{
+    collect_targets, 
+    calculate_entropy,
+    structs::FileEntropy
+};
 
 /// 
 /// Parser config
 ///
 /// Also note that we can know directly create [PathBuf]
 /// objects from the args!
+///
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -30,12 +34,13 @@ fn main() -> Result<(), String> {
 
     println!("Entropy Threshold: {min_entropy}");
     let targets = collect_targets(PathBuf::from(target.to_owned()));
+    // Store entropies for analysis
+    let mut entropies: Vec<FileEntropy> = Vec::with_capacity(targets.len());
     for target in targets {
-        let entropy = calculate_entropy(&PathBuf::from(target.to_owned()))?;
-        // Only print when entropy is above threshold
-        if entropy >= min_entropy {
-            println!("{target:?}: {entropy}");
-        }
+        // Create the entropy entries and push them
+        let file_entropy = calculate_entropy(&PathBuf::from(target.to_owned()))?;
+        entropies.push(file_entropy);
     }
+
     Ok(())
 }
