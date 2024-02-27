@@ -31,3 +31,5 @@ A big leap! In this stage, we refactor our code to get the logic out of `main.rs
 We want to add some new features to our scanner, but to do that, we need to start thinking about the data more formally. In this stage, we a `FileEntropy` struct that helps us contain useful information in one place.
 
 But the biggest change here is in the addition of the `stats` module, which adds statistical calculations about our discovered files. Although not yet used in the program, getting this code down is a major change for this stage.
+
+## Stage 6: Subcommands
