@@ -48,7 +48,7 @@ enum Command {
         target: PathBuf,
 
         #[arg(short, help = "Do not print outliers")]
-        no_outliers: Option<bool>
+        no_outliers: bool
     }
 
 
@@ -80,13 +80,14 @@ fn main() -> Result<(), String> {
         },
         Command::Stats { target, no_outliers } => {
             let targets = collect_targets(PathBuf::from(target.to_owned()));
-            let entropies = collect_entropies(targets);
+            let entropies = collect_entropies(targets.clone());
             println!("Statistics for {}", target.to_str().unwrap());
+            println!("Total Items Scanned: {}", targets.len());
             println!("Mean Entropy: {:.3}", mean(entropies.clone()).unwrap());
             println!("Median Entropy: {:.3}", median(entropies.clone()).unwrap());
             println!("Variance Entropy: {:.3}", variance(entropies.clone()).unwrap());
             println!("IQR: {:?}", interquartile_range(entropies.clone()).unwrap());
-            if let None = no_outliers {
+            if !no_outliers {
                 if let Some(outliers) = entropy_outliers(entropies.clone()) {
                     println!("Outliers\n========");
                     for o in outliers {
