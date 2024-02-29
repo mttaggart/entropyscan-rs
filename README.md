@@ -26,8 +26,8 @@ Before we add another feature, we need to clean up our CLI option management. It
 
 A big leap! In this stage, we refactor our code to get the logic out of `main.rs` and into a separate module. This lays the groundwork for easily adding new features.
 
-## Stage 5: `FileEntropy` And a Lot of Math
+## Stage 5: Structs And a Lot of Math
 
 We want to add some new features to our scanner, but to do that, we need to start thinking about the data more formally. In this stage, we a `FileEntropy` struct that helps us contain useful information in one place.
 
-But the biggest change here is in the addition of the `stats` module, which adds statistical calculations about our discovered files. Although not yet used in the program, getting this code down is a major change for this stage.
+But the biggest change here is in the addition of the `stats` module, which adds statistical calculations about our discovered files. Although not yet used in the program, getting this code down is a major change for this stage. This includes an `IQR` struct to help us contain data about the interquartile range for outliers.
