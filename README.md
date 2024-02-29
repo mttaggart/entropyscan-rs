@@ -33,3 +33,5 @@ We want to add some new features to our scanner, but to do that, we need to star
 But the biggest change here is in the addition of the `stats` module, which adds statistical calculations about our discovered files. Although not yet used in the program, getting this code down is a major change for this stage.
 
 ## Stage 6: Subcommands
+
+We laid the groundwork in Stage 5 to provide statistical information about our scan target: average and median entropies, variance, and even outliers based on the IQR method. This output is so much different than the standard listing, it should probably be a separate command. Luckily, we've already implemented Clap, so refactoring to subcommands will be relatively easy. We will have to write the code to print the stats, but that's no biggie, given our nice clean functions.
