@@ -44,4 +44,10 @@ We've added all the functionality we really wanted, so now we get to think about
 
 Our last order of business is to provide the user some options for output. The default table is nice, but we may want to make the data usable in other tools. For this, we'll provide 2 other options: CSV and JSON outputs, gated by the `-f` or `--format` options. This will be available for both `stats` and `scan` subcommands.
 
-This introduces an invaluable library: `serde-json`.
+This introduces an invaluable library: `serde-json`, for converting our structs directly into JSON.
+
+## Stage 9: Finishing Touches
+
+We are feature-complete! What remains is for us to review our code for areas to clean up, both from an efficiency and style standpoint.
+
+One of the best improvements is the removal of those pesky `clone()` invocations, in favor of references. When we don't need to pass whole structs around, let's not!
