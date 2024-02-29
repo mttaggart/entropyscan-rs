@@ -3,6 +3,16 @@ use std::clone;
 use crate::FileEntropy;
 
 ///
+/// Struct for saving the Q1, Q3, and interquartile range data 
+/// we use for outlier calculations. 
+///
+pub struct IQR {
+    pub q1: f64,
+    pub q3: f64,
+    pub iqr: f64
+}
+
+///
 /// Calculate the mean of a [Vec] of [FileEntropy]
 ///
 pub fn mean(entropies: Vec<FileEntropy>) -> Option<f64> {
@@ -85,8 +95,9 @@ pub fn variance(entropies: Vec<FileEntropy>) -> Option<f64> {
 
 ///
 /// Calculate the [interquartile range](https://en.wikipedia.org/wiki/Interquartile_range) of a [Vec] of [FileEntropy]
+/// We'll safe 
 ///
-pub fn interquartile_range(entropies: Vec<FileEntropy>) -> Option<f64> {
+pub fn interquartile_range(entropies: Vec<FileEntropy>) -> Option<IQR> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -112,7 +123,11 @@ pub fn interquartile_range(entropies: Vec<FileEntropy>) -> Option<f64> {
     let q1 = sorted_entropies[q1_idx - 1].entropy;
     let q3 = sorted_entropies[q3_idx - 1].entropy;
     // The IQR is the distance between the Q1 and Q3 values
-    Some(q3 - q1)
+    Some(IQR {
+        iqr: q3 - q1,
+        q1,
+        q3
+    })
 }
 
 
@@ -132,7 +147,9 @@ pub fn entropy_outliers(entropies: Vec<FileEntropy>) -> Option<Vec<FileEntropy>>
 
     Some(entropies
         .into_iter()
-        .filter(|e| (e.entropy - iqr).abs() >= (1.5 * iqr))
+        .filter(|e| 
+            e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.iqr)
+        )
         .collect()
     )
 
