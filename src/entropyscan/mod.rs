@@ -86,7 +86,7 @@ pub fn collect_targets(parent_path: PathBuf) -> Vec<PathBuf> {
 ///
 /// Collect [FileEntropy] structs from a [Vec] of targets
 ///
-pub fn collect_entropies(targets: Vec<PathBuf>) -> Vec<FileEntropy> {
+pub fn collect_entropies(targets: &Vec<PathBuf>) -> Vec<FileEntropy> {
     // Store entropies for analysis
     let mut entropies: Vec<FileEntropy> = Vec::with_capacity(targets.len());
     for target in targets {

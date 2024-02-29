@@ -14,7 +14,7 @@ pub struct IQR {
 ///
 /// Calculate the mean of a [Vec] of [FileEntropy]
 ///
-pub fn mean(entropies: Vec<FileEntropy>) -> Option<f64> {
+pub fn mean(entropies: &Vec<FileEntropy>) -> Option<f64> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -28,7 +28,7 @@ pub fn mean(entropies: Vec<FileEntropy>) -> Option<f64> {
 ///
 /// Sort a [Vec] of [FileEntropy] 
 ///
-fn sort_entropies(entropies: Vec<FileEntropy>) -> Vec<FileEntropy> {
+fn sort_entropies(entropies: &Vec<FileEntropy>) -> Vec<FileEntropy> {
     // We're gonna sort this thing, so copy it to work with it
     let mut sorted_entropies = entropies.clone();
 
@@ -42,7 +42,7 @@ fn sort_entropies(entropies: Vec<FileEntropy>) -> Vec<FileEntropy> {
 ///
 /// Calculate the median of a [Vec] of [FileEntropy]
 ///
-pub fn median(entropies: Vec<FileEntropy>) -> Option<f64> {
+pub fn median(entropies: &Vec<FileEntropy>) -> Option<f64> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -68,7 +68,7 @@ pub fn median(entropies: Vec<FileEntropy>) -> Option<f64> {
 ///
 /// Calculate the [variance](https://en.wikipedia.org/wiki/Variance) of a [Vec] of [FileEntropy]
 ///
-pub fn variance(entropies: Vec<FileEntropy>) -> Option<f64> {
+pub fn variance(entropies: &Vec<FileEntropy>) -> Option<f64> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -78,7 +78,7 @@ pub fn variance(entropies: Vec<FileEntropy>) -> Option<f64> {
     let len = entropies.len() as f64;
 
     // Calculate the mean
-    let mean = mean(entropies.clone()).unwrap();
+    let mean = mean(entropies).unwrap();
 
     // Calculate the sum of squared differences from the mean
     let sum_of_squared_diffs = entropies
@@ -96,7 +96,7 @@ pub fn variance(entropies: Vec<FileEntropy>) -> Option<f64> {
 /// Calculate the [interquartile range](https://en.wikipedia.org/wiki/Interquartile_range) of a [Vec] of [FileEntropy]
 /// We'll safe 
 ///
-pub fn interquartile_range(entropies: Vec<FileEntropy>) -> Option<IQR> {
+pub fn interquartile_range(entropies: &Vec<FileEntropy>) -> Option<IQR> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -134,7 +134,7 @@ pub fn interquartile_range(entropies: Vec<FileEntropy>) -> Option<IQR> {
 /// Calculate outliers based on the IQR of the 
 /// [Vec] of [FileEntropy]. 
 ///
-pub fn entropy_outliers(entropies: Vec<FileEntropy>) -> Option<Vec<FileEntropy>> {
+pub fn entropy_outliers(entropies: &Vec<FileEntropy>) -> Option<Vec<FileEntropy>> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -142,15 +142,16 @@ pub fn entropy_outliers(entropies: Vec<FileEntropy>) -> Option<Vec<FileEntropy>>
 
     // Unwrap is cool here because we solved the failure case above
     // But we clone here to handle the later move
-    let iqr = interquartile_range(entropies.clone()).unwrap();
+    let iqr = interquartile_range(entropies).unwrap();
     let outliers: Vec<FileEntropy> = entropies
         .into_iter()
         .filter(|e| 
             e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.iqr)
         )
+        .map(|e| e.to_owned())
         .collect();
 
     // We do the user a solid and show the outliers sorted ascending
-    Some(sort_entropies(outliers))
+    Some(sort_entropies(&outliers))
 
 }

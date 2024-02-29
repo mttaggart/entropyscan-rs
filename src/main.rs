@@ -104,7 +104,7 @@ fn main() -> Result<(), String> {
 
             let targets = collect_targets(PathBuf::from(target.to_owned()));
 
-            let entropies: Vec<FileEntropy> = collect_entropies(targets)
+            let entropies: Vec<FileEntropy> = collect_entropies(&targets)
                 .into_iter()
                 .filter(|e| e.entropy >= min_entropy)
                 .collect();
@@ -134,13 +134,13 @@ fn main() -> Result<(), String> {
             format,
         } => {
             let targets = collect_targets(PathBuf::from(target.to_owned()));
-            let entropies = collect_entropies(targets.clone());
+            let entropies = collect_entropies(&targets);
             let stats = Stats {
                 target,
                 total: entropies.len(),
-                mean: mean(entropies.clone()).unwrap(),
-                median: median(entropies.clone()).unwrap(),
-                variance: variance(entropies.clone()).unwrap(),
+                mean: mean(&entropies).unwrap(),
+                median: median(&entropies).unwrap(),
+                variance: variance(&entropies).unwrap(),
             };
 
             match format {
@@ -150,7 +150,7 @@ fn main() -> Result<(), String> {
                     println!("{stats_table}");
 
                     if !no_outliers {
-                        if let Some(outliers) = entropy_outliers(entropies) {
+                        if let Some(outliers) = entropy_outliers(&entropies) {
                             println!("\n========\nOutliers\n========\n");
                             let outliers_table = Table::new(outliers).to_string();
                             println!("{outliers_table}");
@@ -162,7 +162,7 @@ fn main() -> Result<(), String> {
                         "stats": stats,
                         "outliers": match no_outliers {
                             true => vec![],
-                            false => entropy_outliers(entropies).unwrap()
+                            false => entropy_outliers(&entropies).unwrap()
                         }
                     });
                     let json_string = serde_json::to_string_pretty(&json).unwrap();
@@ -179,7 +179,7 @@ fn main() -> Result<(), String> {
                         stats.variance
                     );
                     if !no_outliers {
-                        if let Some(outliers) = entropy_outliers(entropies) {
+                        if let Some(outliers) = entropy_outliers(&entropies) {
                             println!("\n=========\nOutliers\n=========\n");
                             println!("path,entropy");
                             for o in outliers {
