@@ -6,6 +6,7 @@ use crate::FileEntropy;
 /// Struct for saving the Q1, Q3, and interquartile range data 
 /// we use for outlier calculations. 
 ///
+#[derive(Debug)]
 pub struct IQR {
     pub q1: f64,
     pub q3: f64,
@@ -144,13 +145,14 @@ pub fn entropy_outliers(entropies: Vec<FileEntropy>) -> Option<Vec<FileEntropy>>
     // Unwrap is cool here because we solved the failure case above
     // But we clone here to handle the later move
     let iqr = interquartile_range(entropies.clone()).unwrap();
-
-    Some(entropies
+    let outliers: Vec<FileEntropy> = entropies
         .into_iter()
         .filter(|e| 
             e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.iqr)
         )
-        .collect()
-    )
+        .collect();
+
+    // We do the user a solid and show the outliers sorted ascending
+    Some(sort_entropies(outliers))
 
 }

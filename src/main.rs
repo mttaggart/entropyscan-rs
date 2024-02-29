@@ -85,7 +85,7 @@ fn main() -> Result<(), String> {
             println!("Mean Entropy: {:.3}", mean(entropies.clone()).unwrap());
             println!("Median Entropy: {:.3}", median(entropies.clone()).unwrap());
             println!("Variance Entropy: {:.3}", variance(entropies.clone()).unwrap());
-            println!("IQR: {:.3}", interquartile_range(entropies.clone()).unwrap().iqr);
+            println!("IQR: {:?}", interquartile_range(entropies.clone()).unwrap());
             if let None = no_outliers {
                 if let Some(outliers) = entropy_outliers(entropies.clone()) {
                     println!("Outliers\n========");
