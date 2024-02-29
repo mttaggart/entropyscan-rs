@@ -1,5 +1,3 @@
-use std::clone;
-
 use crate::FileEntropy;
 
 ///

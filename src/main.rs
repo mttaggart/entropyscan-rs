@@ -1,18 +1,19 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 mod entropyscan;
 use entropyscan::{
     collect_targets, 
     collect_entropies,
-    structs::FileEntropy,
+    structs::{FileEntropy, Stats},
     stats::{
         mean,
         median,
         variance,
         entropy_outliers,
-        interquartile_range
     }
 };
+
+use tabled::Table;
 
 /// 
 /// Parser config
@@ -66,14 +67,13 @@ fn main() -> Result<(), String> {
             println!("Entropy Threshold: {min_entropy}");
             let targets = collect_targets(PathBuf::from(target.to_owned()));
            
-            let entropies = collect_entropies(targets);
+            let entropies: Vec<FileEntropy> = collect_entropies(targets)
+                .into_iter()
+                .filter(|e| e.entropy >= min_entropy)
+                .collect();
             
-            println!("PATH\tENTROPY");
-            for e in entropies {
-                if e.entropy >= min_entropy {
-                    println!("{}\t{:.3}", e.path.to_str().unwrap(), e.entropy)
-                }
-            }
+            let table = Table::new(entropies).to_string();
+            println!("{table}");
         
             Ok(())
 
@@ -81,18 +81,26 @@ fn main() -> Result<(), String> {
         Command::Stats { target, no_outliers } => {
             let targets = collect_targets(PathBuf::from(target.to_owned()));
             let entropies = collect_entropies(targets.clone());
-            println!("Statistics for {}", target.to_str().unwrap());
-            println!("Total Items Scanned: {}", targets.len());
-            println!("Mean Entropy: {:.3}", mean(entropies.clone()).unwrap());
-            println!("Median Entropy: {:.3}", median(entropies.clone()).unwrap());
-            println!("Variance Entropy: {:.3}", variance(entropies.clone()).unwrap());
-            println!("IQR: {:?}", interquartile_range(entropies.clone()).unwrap());
+            let stats = Stats {
+                target,
+                total: entropies.len(),
+                mean: mean(entropies.clone()).unwrap(),
+                median: median(entropies.clone()).unwrap(),
+                variance: variance(entropies.clone()).unwrap(),
+            };
+
+            let stats_table = Table::new(
+                vec![stats]
+            )
+            .to_string();
+
+            println!("{stats_table}");
+
             if !no_outliers {
                 if let Some(outliers) = entropy_outliers(entropies.clone()) {
-                    println!("Outliers\n========");
-                    for o in outliers {
-                        println!("{}\t{:.3}", o.path.to_str().unwrap(), o.entropy)
-                    }
+                    println!("========\nOutliers\n========");
+                    let outliers_table = Table::new(outliers).to_string();
+            println!("{outliers_table}");
                 }
             }
             Ok(())

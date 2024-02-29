@@ -36,3 +36,7 @@ But the biggest change here is in the addition of the `stats` module, which adds
 
 We laid the groundwork in Stage 5 to provide statistical information about our scan target: average and median entropies, variance, and even outliers based on the IQR method. This output is so much different than the standard listing, it should probably be a separate command. Luckily, we've already implemented Clap, so refactoring to subcommands will be relatively easy. We will have to write the code to print the stats, but that's no biggie, given our nice clean functions.
 
+## Stage 7: Creature Comforts
+
+We've added all the functionality we really wanted, so now we get to think about making our user interface a little nicer. In particular, it'd be nice if the output was nicer than just tab-separated fields. Let's make the default output a nice visual table. To accomplish this, we'll add another dependency: the [tabled](https://github.com/zhiburt/tabled) library.
+
