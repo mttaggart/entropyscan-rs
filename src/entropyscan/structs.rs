@@ -2,8 +2,9 @@ use std::borrow::Cow;
 use std::path::PathBuf;
 
 use tabled::Tabled;
+use serde::Serialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct FileEntropy {
     pub path: PathBuf,
     pub entropy: f64,
@@ -32,7 +33,7 @@ impl Tabled for FileEntropy {
 /// Contains our statistics information 
 /// for easy reporting and display. 
 ///
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Stats {
     pub target: PathBuf,
     pub total: usize,

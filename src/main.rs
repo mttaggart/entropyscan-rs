@@ -13,6 +13,7 @@ use entropyscan::{
     }
 };
 
+use serde_json::json;
 use tabled::Table;
 
 /// 
@@ -81,7 +82,6 @@ fn main() -> Result<(), String> {
         Command::Scan { target , min_entropy, format } => {
             let min_entropy = min_entropy.unwrap();
         
-            println!("Entropy Threshold: {min_entropy}");
             let targets = collect_targets(PathBuf::from(target.to_owned()));
            
             let entropies: Vec<FileEntropy> = collect_entropies(targets)
@@ -89,8 +89,20 @@ fn main() -> Result<(), String> {
                 .filter(|e| e.entropy >= min_entropy)
                 .collect();
             
-            let table = Table::new(entropies).to_string();
-            println!("{table}");
+            match format {
+                OutputFormat::Table => {
+                    let table = Table::new(entropies).to_string();
+                    println!("{table}");
+                },
+                OutputFormat::Json => {
+                    let json = serde_json::to_string_pretty(&entropies).unwrap();
+                    println!("{json}");
+                },
+                OutputFormat::Csv => {
+                    unimplemented!();
+                }
+            }
+
         
             Ok(())
 
@@ -106,20 +118,39 @@ fn main() -> Result<(), String> {
                 variance: variance(entropies.clone()).unwrap(),
             };
 
-            let stats_table = Table::new(
-                vec![stats]
-            )
-            .to_string();
-
-            println!("{stats_table}");
-
-            if !no_outliers {
-                if let Some(outliers) = entropy_outliers(entropies.clone()) {
-                    println!("========\nOutliers\n========");
-                    let outliers_table = Table::new(outliers).to_string();
-            println!("{outliers_table}");
+            match format {
+                OutputFormat::Table => {
+                    let stats_table = Table::new(
+                        vec![stats]
+                    )
+                    .to_string();
+        
+                    println!("{stats_table}");
+        
+                    if !no_outliers {
+                        if let Some(outliers) = entropy_outliers(entropies) {
+                            println!("========\nOutliers\n========");
+                            let outliers_table = Table::new(outliers).to_string();
+                    println!("{outliers_table}");
+                        }
+                    }
+                }, 
+                OutputFormat::Json => {
+                    let json = json!({
+                        "stats": stats,
+                        "outliers": match no_outliers {
+                            true => vec![],
+                            false => entropy_outliers(entropies).unwrap()
+                        }
+                    });
+                    let json_string = serde_json::to_string_pretty(&json).unwrap();
+                    println!("{json_string}");
+                },
+                OutputFormat::Csv => {
+                    unimplemented!();
                 }
             }
+
             Ok(())
         }
     }

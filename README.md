@@ -40,3 +40,8 @@ We laid the groundwork in Stage 5 to provide statistical information about our s
 
 We've added all the functionality we really wanted, so now we get to think about making our user interface a little nicer. In particular, it'd be nice if the output was nicer than just tab-separated fields. Let's make the default output a nice visual table. To accomplish this, we'll add another dependency: the [tabled](https://github.com/zhiburt/tabled) library.
 
+## Stage 8: Formats
+
+Our last order of business is to provide the user some options for output. The default table is nice, but we may want to make the data usable in other tools. For this, we'll provide 2 other options: CSV and JSON outputs, gated by the `-f` or `--format` options. This will be available for both `stats` and `scan` subcommands.
+
+This introduces an invaluable library: `serde-json`.
