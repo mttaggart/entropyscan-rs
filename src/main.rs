@@ -1,22 +1,16 @@
-use std::path::PathBuf;
 use clap::{Parser, Subcommand, ValueEnum};
+use std::path::PathBuf;
 mod entropyscan;
 use entropyscan::{
-    collect_targets, 
-    collect_entropies,
+    collect_entropies, collect_targets,
+    stats::{entropy_outliers, mean, median, variance},
     structs::{FileEntropy, Stats},
-    stats::{
-        mean,
-        median,
-        variance,
-        entropy_outliers,
-    }
 };
 
 use serde_json::json;
 use tabled::Table;
 
-/// 
+///
 /// Parser config
 ///
 /// Also note that we can know directly create [PathBuf]
@@ -26,40 +20,64 @@ use tabled::Table;
 #[command(version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Command
+    command: Command,
 }
 
 #[derive(Subcommand)]
 enum Command {
-
     /// entropy-rs scan
     Scan {
         /// Target path
-        #[arg(short, long, value_name = "TARGET", help="Target file or path to scan")]
+        #[arg(
+            short,
+            long,
+            value_name = "TARGET",
+            help = "Target file or path to scan"
+        )]
         target: PathBuf,
-        
-        /// Optional minimum entropy threshold
-        #[arg(short, long, value_name = "MIN_ENTROPY", help="Minimum entropy to display", default_value = "0")]
-        min_entropy: Option<f64>,     
 
-        #[arg(short, long, value_name = "FORMAT", help="Output format", default_value = "table")]
-        format: OutputFormat
+        /// Optional minimum entropy threshold
+        #[arg(
+            short,
+            long,
+            value_name = "MIN_ENTROPY",
+            help = "Minimum entropy to display",
+            default_value = "0"
+        )]
+        min_entropy: Option<f64>,
+
+        #[arg(
+            short,
+            long,
+            value_name = "FORMAT",
+            help = "Output format",
+            default_value = "table"
+        )]
+        format: OutputFormat,
     },
 
     Stats {
-
         /// Target path
-        #[arg(short, long, value_name = "TARGET", help="Target file or path to scan")]
+        #[arg(
+            short,
+            long,
+            value_name = "TARGET",
+            help = "Target file or path to scan"
+        )]
         target: PathBuf,
 
         #[arg(short, help = "Do not print outliers")]
         no_outliers: bool,
 
-        #[arg(short, long, value_name = "FORMAT", help="Output format", default_value = "table")]
-        format: OutputFormat
-    }
-
-
+        #[arg(
+            short,
+            long,
+            value_name = "FORMAT",
+            help = "Output format",
+            default_value = "table"
+        )]
+        format: OutputFormat,
+    },
 }
 
 ///
@@ -69,45 +87,52 @@ enum Command {
 enum OutputFormat {
     Table,
     Json,
-    Csv
+    Csv,
 }
 
-
 fn main() -> Result<(), String> {
-
     let args = Cli::parse();
 
     // Now that we're using subcommands, all this is in a match!
     match args.command {
-        Command::Scan { target , min_entropy, format } => {
+        Command::Scan {
+            target,
+            min_entropy,
+            format,
+        } => {
             let min_entropy = min_entropy.unwrap();
-        
+
             let targets = collect_targets(PathBuf::from(target.to_owned()));
-           
+
             let entropies: Vec<FileEntropy> = collect_entropies(targets)
                 .into_iter()
                 .filter(|e| e.entropy >= min_entropy)
                 .collect();
-            
+
             match format {
                 OutputFormat::Table => {
                     let table = Table::new(entropies).to_string();
                     println!("{table}");
-                },
+                }
                 OutputFormat::Json => {
                     let json = serde_json::to_string_pretty(&entropies).unwrap();
                     println!("{json}");
-                },
+                }
                 OutputFormat::Csv => {
-                    unimplemented!();
+                    println!("path,entropy");
+                    for e in entropies {
+                        println!("{},{:.3}", e.path.to_str().unwrap(), e.entropy);
+                    }
                 }
             }
 
-        
             Ok(())
-
-        },
-        Command::Stats { target, no_outliers, format } => {
+        }
+        Command::Stats {
+            target,
+            no_outliers,
+            format,
+        } => {
             let targets = collect_targets(PathBuf::from(target.to_owned()));
             let entropies = collect_entropies(targets.clone());
             let stats = Stats {
@@ -120,21 +145,18 @@ fn main() -> Result<(), String> {
 
             match format {
                 OutputFormat::Table => {
-                    let stats_table = Table::new(
-                        vec![stats]
-                    )
-                    .to_string();
-        
+                    let stats_table = Table::new(vec![stats]).to_string();
+
                     println!("{stats_table}");
-        
+
                     if !no_outliers {
                         if let Some(outliers) = entropy_outliers(entropies) {
-                            println!("========\nOutliers\n========");
+                            println!("\n========\nOutliers\n========\n");
                             let outliers_table = Table::new(outliers).to_string();
-                    println!("{outliers_table}");
+                            println!("{outliers_table}");
                         }
                     }
-                }, 
+                }
                 OutputFormat::Json => {
                     let json = json!({
                         "stats": stats,
@@ -145,14 +167,30 @@ fn main() -> Result<(), String> {
                     });
                     let json_string = serde_json::to_string_pretty(&json).unwrap();
                     println!("{json_string}");
-                },
+                }
                 OutputFormat::Csv => {
-                    unimplemented!();
+                    println!("target,total,mean,median,variance");
+                    println!(
+                        "{},{},{:.3},{:.3},{:.3}",
+                        stats.target.to_str().unwrap(),
+                        stats.total,
+                        stats.mean,
+                        stats.median,
+                        stats.variance
+                    );
+                    if !no_outliers {
+                        if let Some(outliers) = entropy_outliers(entropies) {
+                            println!("\n=========\nOutliers\n=========\n");
+                            println!("path,entropy");
+                            for o in outliers {
+                                println!("{},{:.3}", o.path.to_str().unwrap(), o.entropy);
+                            }
+                        }
+                    }
                 }
             }
 
             Ok(())
         }
     }
-
 }
