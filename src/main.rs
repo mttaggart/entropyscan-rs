@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 mod entropyscan;
 use entropyscan::{
     collect_targets, 
@@ -39,7 +39,10 @@ enum Command {
         
         /// Optional minimum entropy threshold
         #[arg(short, long, value_name = "MIN_ENTROPY", help="Minimum entropy to display", default_value = "0")]
-        min_entropy: Option<f64>,        
+        min_entropy: Option<f64>,     
+
+        #[arg(short, long, value_name = "FORMAT", help="Output format", default_value = "table")]
+        format: OutputFormat
     },
 
     Stats {
@@ -49,11 +52,25 @@ enum Command {
         target: PathBuf,
 
         #[arg(short, help = "Do not print outliers")]
-        no_outliers: bool
+        no_outliers: bool,
+
+        #[arg(short, long, value_name = "FORMAT", help="Output format", default_value = "table")]
+        format: OutputFormat
     }
 
 
 }
+
+///
+/// Our possible output formats
+///
+#[derive(ValueEnum, Clone)]
+enum OutputFormat {
+    Table,
+    Json,
+    Csv
+}
+
 
 fn main() -> Result<(), String> {
 
@@ -61,7 +78,7 @@ fn main() -> Result<(), String> {
 
     // Now that we're using subcommands, all this is in a match!
     match args.command {
-        Command::Scan { target , min_entropy } => {
+        Command::Scan { target , min_entropy, format } => {
             let min_entropy = min_entropy.unwrap();
         
             println!("Entropy Threshold: {min_entropy}");
@@ -78,7 +95,7 @@ fn main() -> Result<(), String> {
             Ok(())
 
         },
-        Command::Stats { target, no_outliers } => {
+        Command::Stats { target, no_outliers, format } => {
             let targets = collect_targets(PathBuf::from(target.to_owned()));
             let entropies = collect_entropies(targets.clone());
             let stats = Stats {
