@@ -21,7 +21,7 @@ const MAX_ENTROPY_CHUNK: usize = 2560000;
 /// Uses [MAX_FILESIZE] as a hard limit
 /// for what will be scanned.
 ///
-pub fn calculate_entropy(path: &Path) -> Result<FileEntropy, String> {
+fn calculate_entropy(path: &Path) -> Result<FileEntropy, String> {
 
     // Check for ELF
 
@@ -81,4 +81,20 @@ pub fn collect_targets(parent_path: PathBuf) -> Vec<PathBuf> {
         }
     }
     targets
+}
+
+///
+/// Collect [FileEntropy] structs from a [Vec] of targets
+///
+pub fn collect_entropies(targets: Vec<PathBuf>) -> Vec<FileEntropy> {
+    // Store entropies for analysis
+    let mut entropies: Vec<FileEntropy> = Vec::with_capacity(targets.len());
+    for target in targets {
+        
+        // Create the entropy entries and push them
+        if let Ok(file_entropy) = calculate_entropy(&PathBuf::from(target.to_owned())) {
+            entropies.push(file_entropy);
+        }
+    }
+    entropies
 }

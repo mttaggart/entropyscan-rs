@@ -111,7 +111,6 @@ pub fn interquartile_range(entropies: Vec<FileEntropy>) -> Option<f64> {
     // Calculate the values of the first quartile (Q1) and third quartile (Q3)
     let q1 = sorted_entropies[q1_idx - 1].entropy;
     let q3 = sorted_entropies[q3_idx - 1].entropy;
-
     // The IQR is the distance between the Q1 and Q3 values
     Some(q3 - q1)
 }
@@ -133,7 +132,7 @@ pub fn entropy_outliers(entropies: Vec<FileEntropy>) -> Option<Vec<FileEntropy>>
 
     Some(entropies
         .into_iter()
-        .filter(|e| (e.entropy - iqr).abs() >= 1.5 * iqr)
+        .filter(|e| (e.entropy - iqr).abs() >= (1.5 * iqr))
         .collect()
     )
 
