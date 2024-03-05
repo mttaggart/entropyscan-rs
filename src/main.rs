@@ -102,7 +102,7 @@ fn main() -> Result<(), String> {
         } => {
             let min_entropy = min_entropy.unwrap();
 
-            let targets = collect_targets(PathBuf::from(target.to_owned()));
+            let targets = collect_targets(target.to_owned());
 
             let entropies: Vec<FileEntropy> = collect_entropies(&targets)
                 .into_iter()
@@ -133,7 +133,7 @@ fn main() -> Result<(), String> {
             no_outliers,
             format,
         } => {
-            let targets = collect_targets(PathBuf::from(target.to_owned()));
+            let targets = collect_targets(target.to_owned());
             let entropies = collect_entropies(&targets);
             let stats = Stats {
                 target,

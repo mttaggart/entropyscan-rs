@@ -1,14 +1,14 @@
 use crate::FileEntropy;
 
 ///
-/// Struct for saving the Q1, Q3, and interquartile range data 
-/// we use for outlier calculations. 
+/// Struct for saving the Q1, Q3, and interquartile range data
+/// we use for outlier calculations.
 ///
 #[derive(Debug)]
-pub struct IQR {
+pub struct Iqr {
     pub q1: f64,
     pub q3: f64,
-    pub iqr: f64
+    pub iqr: f64,
 }
 
 ///
@@ -22,11 +22,11 @@ pub fn mean(entropies: &Vec<FileEntropy>) -> Option<f64> {
 
     // Save the length for use in the calculation
     let entropies_len = entropies.len() as f64;
-    Some(entropies.into_iter().map(|e| e.entropy).sum::<f64>() / entropies_len)
+    Some(entropies.iter().map(|e| e.entropy).sum::<f64>() / entropies_len)
 }
 
 ///
-/// Sort a [Vec] of [FileEntropy] 
+/// Sort a [Vec] of [FileEntropy]
 ///
 fn sort_entropies(entropies: &Vec<FileEntropy>) -> Vec<FileEntropy> {
     // We're gonna sort this thing, so copy it to work with it
@@ -82,7 +82,7 @@ pub fn variance(entropies: &Vec<FileEntropy>) -> Option<f64> {
 
     // Calculate the sum of squared differences from the mean
     let sum_of_squared_diffs = entropies
-        .into_iter()
+        .iter()
         .map(|e| (e.entropy - mean).powi(2))
         .sum::<f64>();
 
@@ -94,9 +94,9 @@ pub fn variance(entropies: &Vec<FileEntropy>) -> Option<f64> {
 
 ///
 /// Calculate the [interquartile range](https://en.wikipedia.org/wiki/Interquartile_range) of a [Vec] of [FileEntropy]
-/// We'll safe 
+/// We'll safe
 ///
-pub fn interquartile_range(entropies: &Vec<FileEntropy>) -> Option<IQR> {
+pub fn interquartile_range(entropies: &Vec<FileEntropy>) -> Option<Iqr> {
     // Return None if the set is empty
     if entropies.is_empty() {
         return None;
@@ -112,7 +112,7 @@ pub fn interquartile_range(entropies: &Vec<FileEntropy>) -> Option<IQR> {
     // We have to account for even/odd weirdness with integers
     let q1_idx = match len % 2 {
         0 => len / 4,
-        _ => (len + 1) / 4
+        _ => (len + 1) / 4,
     };
 
     // Multiply by 3 for Q3
@@ -121,18 +121,17 @@ pub fn interquartile_range(entropies: &Vec<FileEntropy>) -> Option<IQR> {
     // Calculate the values of the first quartile (Q1) and third quartile (Q3)
     let q1 = sorted_entropies[q1_idx - 1].entropy;
     let q3 = sorted_entropies[q3_idx - 1].entropy;
-    // The IQR is the distance between the Q1 and Q3 values
-    Some(IQR {
+    // The Iqr is the distance between the Q1 and Q3 values
+    Some(Iqr {
         iqr: q3 - q1,
         q1,
-        q3
+        q3,
     })
 }
 
-
 ///
-/// Calculate outliers based on the IQR of the 
-/// [Vec] of [FileEntropy]. 
+/// Calculate outliers based on the Iqr of the
+/// [Vec] of [FileEntropy].
 ///
 pub fn entropy_outliers(entropies: &Vec<FileEntropy>) -> Option<Vec<FileEntropy>> {
     // Return None if the set is empty
@@ -144,14 +143,12 @@ pub fn entropy_outliers(entropies: &Vec<FileEntropy>) -> Option<Vec<FileEntropy>
     // But we clone here to handle the later move
     let iqr = interquartile_range(entropies).unwrap();
     let outliers: Vec<FileEntropy> = entropies
-        .into_iter()
-        .filter(|e| 
-            e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.iqr)
-        )
+        .iter()
+        .filter(|e| e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.iqr))
         .map(|e| e.to_owned())
         .collect();
 
     // We do the user a solid and show the outliers sorted ascending
     Some(sort_entropies(&outliers))
-
 }
+

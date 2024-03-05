@@ -1,8 +1,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub mod structs;
 pub mod stats;
+pub mod structs;
 use structs::FileEntropy;
 
 // Max Filesize of 2GB
@@ -22,7 +22,6 @@ const MAX_ENTROPY_CHUNK: usize = 2560000;
 /// for what will be scanned.
 ///
 fn calculate_entropy(path: &Path) -> Result<FileEntropy, String> {
-
     // Check for ELF
 
     // Check max size
@@ -53,7 +52,7 @@ fn calculate_entropy(path: &Path) -> Result<FileEntropy, String> {
             }
             Ok(FileEntropy {
                 path: path.to_owned(),
-                entropy
+                entropy,
             })
         } else {
             Err("Couldn't read file!".to_string())
@@ -77,6 +76,8 @@ pub fn collect_targets(parent_path: PathBuf) -> Vec<PathBuf> {
                 } else {
                     targets.push(path);
                 }
+            } else {
+                continue;
             }
         }
     }
@@ -90,11 +91,11 @@ pub fn collect_entropies(targets: &Vec<PathBuf>) -> Vec<FileEntropy> {
     // Store entropies for analysis
     let mut entropies: Vec<FileEntropy> = Vec::with_capacity(targets.len());
     for target in targets {
-        
         // Create the entropy entries and push them
-        if let Ok(file_entropy) = calculate_entropy(&PathBuf::from(target.to_owned())) {
+        if let Ok(file_entropy) = calculate_entropy(&target.to_owned()) {
             entropies.push(file_entropy);
         }
     }
     entropies
 }
+
