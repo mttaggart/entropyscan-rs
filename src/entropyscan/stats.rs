@@ -144,7 +144,7 @@ pub fn entropy_outliers(entropies: &Vec<FileEntropy>) -> Option<Vec<FileEntropy>
     let iqr = interquartile_range(entropies).unwrap();
     let outliers: Vec<FileEntropy> = entropies
         .iter()
-        .filter(|e| e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.iqr))
+        .filter(|e| e.entropy <= iqr.q1 - (1.5 * iqr.q1) || e.entropy >= iqr.q3 + (1.5 * iqr.q3))
         .map(|e| e.to_owned())
         .collect();
 
