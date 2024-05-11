@@ -19,21 +19,19 @@ jobs:
     - name: Update Rust
       run: rustup update stable
     - name: Build Debug
-      working-directory: ./agent
       run: cargo build
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: entropyscan-rs_linux_amd64_debug 
-        path: agent/target/debug/entropyscan-rs
+        path: target/debug/entropyscan-rs
     - name: Build Release
-      working-directory: ./agent
       run: cargo build --release
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: entropyscan-rs_linux_amd64 
-        path: agent/target/release/entropyscan-rs
+        path: target/release/entropyscan-rs
   
   build_mac:
 
@@ -44,21 +42,19 @@ jobs:
     - name: Update Rust
       run: rustup update stable
     - name: Build Debug
-      working-directory: ./agent
       run: cargo build
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: entropyscan-rs_darwin_amd64_debug 
-        path: agent/target/debug/entropyscan-rs
+        path: target/debug/entropyscan-rs
     - name: Build Release
-      working-directory: ./agent
       run: cargo build --release --target x86_64-apple-darwin
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: entropyscan-rs_darwin_amd64 
-        path: agent/target/x86_64-apple-darwin/release/entropyscan-rs
+        path: target/x86_64-apple-darwin/release/entropyscan-rs
       
   build_windows:
 
@@ -73,18 +69,16 @@ jobs:
     - name: Add Windows Triple
       run: rustup target add x86_64-pc-windows-gnu 
     - name: Build Debug
-      working-directory: ./agent
       run: cargo build --target x86_64-pc-windows-gnu
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: entropyscan-rs_win_64_debug.exe
-        path: agent/target/x86_64-pc-windows-gnu/debug/entropyscan-rs.exe
+        path: target/x86_64-pc-windows-gnu/debug/entropyscan-rs.exe
     - name: Build Release
-      working-directory: ./agent
       run: cargo build --release --target x86_64-pc-windows-gnu
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: entropyscan-rs_win_64.exe
-        path: agent/target/x86_64-pc-windows-gnu/release/entropyscan-rs.exe
+        path: target/x86_64-pc-windows-gnu/release/entropyscan-rs.exe
