@@ -8,7 +8,7 @@ use entropyscan::{
 };
 
 use serde_json::json;
-use tabled::Table;
+use tabled::{Table, settings::Style};
 
 ///
 /// Parser config
@@ -111,7 +111,8 @@ fn main() -> Result<(), String> {
 
             match format {
                 OutputFormat::Table => {
-                    let table = Table::new(entropies).to_string();
+                    let mut table = Table::new(entropies);
+                    table.with(Style::blank());
                     println!("{table}");
                 }
                 OutputFormat::Json => {
@@ -145,8 +146,8 @@ fn main() -> Result<(), String> {
 
             match format {
                 OutputFormat::Table => {
-                    let stats_table = Table::new(vec![stats]).to_string();
-
+                    let mut stats_table = Table::new(vec![stats]);
+                    stats_table.with(Style::blank());
                     println!("{stats_table}");
 
                     if !no_outliers {
