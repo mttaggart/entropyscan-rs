@@ -6,7 +6,7 @@ This was also a teaching project for subscribed Members of [The Taggart Institut
 
 ## Installation
 
-Check the [releases](https://github.com/mttaggart/entropy-rs/releases) for a precompiled binary.
+Check the [releases](https://github.com/mttaggart/entropyscan-rs/releases/latest) for a precompiled binary.
 
 ## Usage
 
