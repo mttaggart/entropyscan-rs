@@ -1,8 +1,61 @@
 # entropyscan-rs
 
-Entropy scanner for threat hunting. Also, a teaching project.
+Entropy scanner for threat hunting. Written in Rust, of course 🦀. Inspiration taken from [Sandfly Security's tool](https://github.com/mttaggart/sandfly-entropyscan).
+
+This was also a teaching project for subscribed Members of [The Taggart Institute](https://taggartinstitute.org). See the branches for the way the project was built!
+
+## Installation
+
+Check the [releases](https://github.com/mttaggart/entropy-rs/releases/latest) for a precompiled binary
+
+## Usage
+
+```
+Usage: entropyscan-rs <COMMAND>
+
+Commands:
+  scan   entropy-rs scan
+  stats
+  help   Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+```
+
+### `scan`
+
+```
+Usage: entropyscan-rs scan [OPTIONS] --target <TARGET>
+
+Options:
+  -t, --target <TARGET>            Target file or path to scan
+  -m, --min-entropy <MIN_ENTROPY>  Minimum entropy to display [default: 0]
+  -f, --format <FORMAT>            Output format [default: table] [possible values: table, json, csv]
+  -h, --help                       Print help
+```
+
+### `stats`
+
+```
+Usage: entropyscan-rs stats [OPTIONS] --target <TARGET>
+
+Options:
+  -t, --target <TARGET>  Target file or path to scan
+  -n                     Do not print outliers
+  -f, --format <FORMAT>  Output format [default: table] [possible values: table, json, csv]
+  -h, --help             Print help
+```
 
 The project is broken into separate "Stages" of development.
+
+## Contributing
+
+PRs are welcome, but be aware that this is not considered a community project. If there are significant issues or enhancements you wish to see, you will likely be better served forking the project and adding them yourself.
+
+---
+
+# Project Build Stages
 
 ## Stage 0: MVP
 
