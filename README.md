@@ -1,3 +1,5 @@
+# THIS REPO HAS BEEN ARCHIVED AND MOVED TO [CODEBERG](https://codeberg.org/mttaggart/entropyscan-rs)
+
 # entropyscan-rs
 
 Entropy scanner for threat hunting. Written in Rust, of course 🦀. Inspiration taken from [Sandfly Security's tool](https://github.com/mttaggart/sandfly-entropyscan).
